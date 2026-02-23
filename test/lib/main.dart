@@ -1,48 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+//import 'package:intl/date_symbol_data_local.dart';
+import 'package:test/pages/calendar.dart';
+
 
 void main() {
   runApp(MainApp());
 }
-class TableCalenderTest extends StatefulWidget{
-  const TableCalenderTest({Key? Key}) : super(key: Key);
-  
-  @override
-}
-class _CalenderTest extends State<TableCalenderTest>{
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectdDay;
 
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Testing Calendar"),
-      ),
-      body: TableCalendar(
-          firstDay: kFirstDay, 
-          lastDay: kLastDay,
-          focusedDay: _focusedDay, 
-          calendarFormat: _calendarFormat,
-          selectedDayPredicate: (day) {
-            return isSameDay(_selectdDay, day);
-          },
-          onDaySelected: (selectedDay, focusedDay) {
-            if (!isSameDay(_selectdDay, selectedDay)) {
-              setState(() {
-                _selectdDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            }
-          },
-          
-        ),
-    );
-  }
-}
 class MainApp extends StatelessWidget{
-  const MainApp({Key? key}) : super(key: key);
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +36,14 @@ class MainApp extends StatelessWidget{
                 onPressed: null, 
                 icon: Icon(Icons.add),
                 tooltip: "Add Task",
+                ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                tooltip: "Calendar",
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TableCalenderTest()),
+                  ),
                 ),
             ],
             backgroundColor: const Color.fromARGB(255, 55, 102, 231),
