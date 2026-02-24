@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:test/pages/calendar.dart';
 
 void main() {
@@ -21,9 +21,9 @@ class _MainPage extends State<MainApp> {
         child: Scaffold(
           appBar: AppBar(
             leading: const IconButton(
-              onPressed: null,
               icon: Icon(Icons.menu),
               tooltip: "Navigation Menu",
+              onPressed: null,
             ),
             title: Text("Planner"),
             actions: <Widget>[
