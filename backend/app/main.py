@@ -1,20 +1,40 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from datetime import date
+from pydantic import BaseModel, Field, field_validator
 from app.db import init_db, get_connection
 
 app = FastAPI()
 
 
 class TaskCreate(BaseModel):
-    title: str
-    due_date: str  # This is a string for now
+    title: str = Field(..., min_length=1)
+    due_date: date
     completed: bool = False
+
+    @field_validator("title")
+    @classmethod
+    def title_not_blank(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Title cannot be empty")
+        return v
+
 
 class TaskUpdate(BaseModel):
     title: str | None = None
-    due_date: str | None = None
+    due_date: date | None = None
     completed: bool | None = None
 
+    @field_validator("title")
+    @classmethod
+    def title_not_blank_if_present(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            raise ValueError("Title cannot be empty")
+        return v
 
 @app.on_event("startup")
 def on_startup():
@@ -34,7 +54,6 @@ def get_tasks():
     rows = cur.fetchall()
     conn.close()
 
-    # Convert rows into normal Python dicts
     tasks = []
     for r in rows:
         tasks.append({
@@ -53,8 +72,7 @@ def create_task(task: TaskCreate):
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO tasks (title, due_date, completed) VALUES (?, ?, ?)",
-        (task.title, task.due_date, int(task.completed)),
-    )
+        (task.title, task.due_date.isoformat(), int(task.completed)),)
     conn.commit()
     new_id = cur.lastrowid
     conn.close()
@@ -84,7 +102,7 @@ def update_task(task_id: int, task: TaskUpdate):
 
     if task.due_date is not None:
         fields.append("due_date = ?")
-        values.append(task.due_date)
+        values.append(task.due_date.isoformat())
 
     if task.completed is not None:
         fields.append("completed = ?")
@@ -111,7 +129,7 @@ def delete_task(task_id: int):
 
     if not existing:
         conn.close()
-        return {"error": "Task not found"}
+        raise HTTPException(status_code=404, detail="Task not found")
 
     # Delete
     cur.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
