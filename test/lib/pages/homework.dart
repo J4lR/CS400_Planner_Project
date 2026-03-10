@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openHomework extends StatefulWidget {
-  const openHomework({super.key});
+class OpenHomework extends StatefulWidget {
+  const OpenHomework({super.key});
 
   @override
-  State<openHomework> createState() => _HomeworkPage();
+  State<OpenHomework> createState() => _HomeworkPage();
 }
 
-class _HomeworkPage extends State<openHomework> {
+class _HomeworkPage extends State<OpenHomework> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

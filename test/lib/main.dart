@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 //import 'package:intl/date_symbol_data_local.dart';
 import 'package:test/pages/calendar.dart';
 import 'package:test/pages/appointment.dart';
-import 'package:test/pages/taskList.dart';
+import 'package:test/pages/tasklist.dart';
 import 'package:test/pages/homework.dart';
 import 'package:test/pages/meetings.dart';
 import 'package:test/pages/payments.dart';
 import 'package:test/pages/schedule.dart';
-import 'package:test/pages/miscEvent.dart';
+import 'package:test/pages/miscevent.dart';
 
 void main() {
   runApp(MainApp());
@@ -93,7 +93,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Appointments"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openAppointment()),
+                    MaterialPageRoute(builder: (_) => const OpenAppointment()),
                   ),
                   // Opens Appointment page
                 ),
@@ -101,7 +101,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Task List"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openTaskList()),
+                    MaterialPageRoute(builder: (_) => const OpenTaskList()),
                   ),
                   //Opens Task List Page
                 ),
@@ -109,7 +109,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Homework"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openHomework()),
+                    MaterialPageRoute(builder: (_) => const OpenHomework()),
                   ),
                   //Opens Homework page
                 ),
@@ -117,7 +117,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Meetings"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openMeetings()),
+                    MaterialPageRoute(builder: (_) => const OpenMeetings()),
                   ),
                   //Opens Meetings page
                 ),
@@ -125,7 +125,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Schedule"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openSchedule()),
+                    MaterialPageRoute(builder: (_) => const OpenSchedule()),
                   ),
                   // Opens Schedule page
                 ),
@@ -133,7 +133,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Payments"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openPayments()),
+                    MaterialPageRoute(builder: (_) => const OpenPayments()),
                   ),
                   //Opens Payment page
                 ),
@@ -141,7 +141,7 @@ class _MainPage extends State<MainPage> {
                   title: const Text("Misc. Events"),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const openMiscEvent()),
+                    MaterialPageRoute(builder: (_) => const OpenMiscEvent()),
                   ),
                   //Opens Misc. Events page
                 ),

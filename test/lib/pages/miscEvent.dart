@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openMiscEvent extends StatefulWidget {
-  const openMiscEvent({super.key});
+class OpenMiscEvent extends StatefulWidget {
+  const OpenMiscEvent({super.key});
 
   @override
-  State<openMiscEvent> createState() => _MiscEventPage();
+  State<OpenMiscEvent> createState() => _MiscEventPage();
 }
 
-class _MiscEventPage extends State<openMiscEvent> {
+class _MiscEventPage extends State<OpenMiscEvent> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openPayments extends StatefulWidget {
-  const openPayments({super.key});
+class OpenPayments extends StatefulWidget {
+  const OpenPayments({super.key});
 
   @override
-  State<openPayments> createState() => _PaymentsPage();
+  State<OpenPayments> createState() => _PaymentsPage();
 }
 
-class _PaymentsPage extends State<openPayments> {
+class _PaymentsPage extends State<OpenPayments> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

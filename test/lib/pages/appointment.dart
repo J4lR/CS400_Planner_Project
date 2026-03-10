@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openAppointment extends StatefulWidget {
-  const openAppointment({super.key});
+class OpenAppointment extends StatefulWidget {
+  const OpenAppointment({super.key});
 
   @override
-  State<openAppointment> createState() => _AppointmentPage();
+  State<OpenAppointment> createState() => _AppointmentPage();
 }
 
-class _AppointmentPage extends State<openAppointment> {
+class _AppointmentPage extends State<OpenAppointment> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

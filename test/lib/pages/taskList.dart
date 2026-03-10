@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openTaskList extends StatefulWidget {
-  const openTaskList({super.key});
+class OpenTaskList extends StatefulWidget {
+  const OpenTaskList({super.key});
 
   @override
-  State<openTaskList> createState() => _TaskListPage();
+  State<OpenTaskList> createState() => _TaskListPage();
 }
 
-class _TaskListPage extends State<openTaskList> {
+class _TaskListPage extends State<OpenTaskList> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

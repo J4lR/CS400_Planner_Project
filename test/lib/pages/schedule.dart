@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
 
-class openSchedule extends StatefulWidget {
-  const openSchedule({super.key});
+class OpenSchedule extends StatefulWidget {
+  const OpenSchedule({super.key});
 
   @override
-  State<openSchedule> createState() => _SchedulePage();
+  State<OpenSchedule> createState() => _SchedulePage();
 }
 
-class _SchedulePage extends State<openSchedule> {
+class _SchedulePage extends State<OpenSchedule> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
