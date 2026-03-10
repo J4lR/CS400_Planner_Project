@@ -1,27 +1,19 @@
-import sqlite3
-from pathlib import Path
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.models import Base
 
-DB_PATH = Path(__file__).parent / "planner.db"
+DATABASE_URL = "sqlite:///./app/planner.db"
 
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
-def get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
+SessionLocal = sessionmaker(bind=engine)
 
 def init_db():
-    conn = get_connection()
-    cur = conn.cursor()
+    Base.metadata.create_all(bind=engine)
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        due_date TEXT NOT NULL,
-        completed INTEGER NOT NULL DEFAULT 0
-    )
-    """)
-
-    conn.commit()
-    conn.close()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
