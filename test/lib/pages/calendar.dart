@@ -22,11 +22,18 @@ class _CalenderTest extends State<TableCalenderTest> {
         title: Text("Testing Calendar"),
         actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.add_alert),
+            tooltip: "Reminders",
             onPressed: () {
-              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text("No Reminders")));
             },
-            icon: const Icon(Icons.arrow_back),
-            tooltip: "Go Back",
+          ),
+          IconButton(
+            onPressed: null,
+            icon: Icon(Icons.add),
+            tooltip: "Add Task",
           ),
         ],
       ),

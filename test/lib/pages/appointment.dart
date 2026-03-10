@@ -27,6 +27,23 @@ class _AppointmentPage extends State<openAppointment> {
                 );
               },
             ),
+            title: Text("Appointment"),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.add_alert),
+                tooltip: "Reminders",
+                onPressed: () {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text("No Reminders")));
+                },
+              ),
+              IconButton(
+                onPressed: null,
+                icon: Icon(Icons.add),
+                tooltip: "Add Appointment",
+              ),
+            ],
           ),
         ),
       ),

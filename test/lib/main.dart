@@ -71,14 +71,6 @@ class _MainPage extends State<MainPage> {
                 icon: Icon(Icons.add),
                 tooltip: "Add Task",
               ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                tooltip: "Calendar",
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const TableCalenderTest()),
-                ),
-              ),
             ],
             backgroundColor: const Color.fromARGB(255, 55, 102, 231),
           ),
