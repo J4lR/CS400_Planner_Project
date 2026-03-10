@@ -18,7 +18,18 @@ class _CalenderTest extends State<TableCalenderTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Testing Calendar")),
+      appBar: AppBar(
+        title: Text("Testing Calendar"),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.arrow_back),
+            tooltip: "Go Back",
+          ),
+        ],
+      ),
       body: TableCalendar(
         firstDay: kFirstDay,
         lastDay: kLastDay,

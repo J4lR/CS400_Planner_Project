@@ -1,89 +1,61 @@
 import 'package:flutter/material.dart';
+//import 'package:table_calendar/table_calendar.dart';
 //import 'package:intl/date_symbol_data_local.dart';
 import 'package:test/pages/calendar.dart';
+import 'package:test/pages/appointment.dart';
+import 'package:test/pages/taskList.dart';
+import 'package:test/pages/homework.dart';
+import 'package:test/pages/meetings.dart';
+import 'package:test/pages/payments.dart';
+import 'package:test/pages/schedule.dart';
+import 'package:test/pages/miscEvent.dart';
 
 void main() {
   runApp(MainApp());
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
+  static const appTitle = 'Planner';
+
   @override
-  State<MainApp> createState() => _MainPage();
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: appTitle,
+      home: MainPage(title: appTitle),
+    );
+  }
 }
 
-class _MainPage extends State<MainApp> {
+class MainPage extends StatefulWidget {
+  const MainPage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MainPage> createState() => _MainPage();
+}
+
+class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(Icons.menu),
-              tooltip: "Navigation Menu",
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-                Drawer(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      const DrawerHeader(child: Text("DrawerTitle")),
-                      ListTile(
-                        title: const Text("Page 1"),
-                        onTap: () {
-                          //Should go to calendar page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 2"),
-                        onTap: () {
-                          // Should go to Appointment page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 3"),
-                        onTap: () {
-                          //Should go to Task List
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 4"),
-                        onTap: () {
-                          //Should go to Homework page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 5"),
-                        onTap: () {
-                          //Should go to Meetings page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 6"),
-                        onTap: () {
-                          // Should go to Schedule page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 7"),
-                        onTap: () {
-                          //Should go to Payment page
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Page 8"),
-                        onTap: () {
-                          //Should go to Misc. Events page
-                        },
-                      ),
-                    ],
-                  ),
+            leading: Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu),
+                  tooltip: "Navigation Menu",
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
                 );
               },
             ),
-            title: Text("Planner"),
+            title: Text(widget.title),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.add_alert),
@@ -109,6 +81,80 @@ class _MainPage extends State<MainApp> {
               ),
             ],
             backgroundColor: const Color.fromARGB(255, 55, 102, 231),
+          ),
+          drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                const DrawerHeader(child: Text("Pages")),
+                ListTile(
+                  title: const Text("Calendar"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TableCalenderTest(),
+                    ),
+                  ),
+                  // Opens Calendar Page
+                ),
+                ListTile(
+                  title: const Text("Appointments"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openAppointment()),
+                  ),
+                  // Opens Appointment page
+                ),
+                ListTile(
+                  title: const Text("Task List"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openTaskList()),
+                  ),
+                  //Opens Task List Page
+                ),
+                ListTile(
+                  title: const Text("Homework"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openHomework()),
+                  ),
+                  //Opens Homework page
+                ),
+                ListTile(
+                  title: const Text("Meetings"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openMeetings()),
+                  ),
+                  //Opens Meetings page
+                ),
+                ListTile(
+                  title: const Text("Schedule"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openSchedule()),
+                  ),
+                  // Opens Schedule page
+                ),
+                ListTile(
+                  title: const Text("Payments"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openPayments()),
+                  ),
+                  //Opens Payment page
+                ),
+                ListTile(
+                  title: const Text("Misc. Events"),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const openMiscEvent()),
+                  ),
+                  //Opens Misc. Events page
+                ),
+              ],
+            ),
           ),
           body: Column(
             children: [
