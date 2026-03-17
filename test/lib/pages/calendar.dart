@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:test/utils.dart';
+import 'package:test/components/my_appbar.dart';
 
 class TableCalenderTest extends StatefulWidget {
   const TableCalenderTest({super.key});
@@ -18,25 +19,8 @@ class _CalenderTest extends State<TableCalenderTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Testing Calendar"),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.add_alert),
-            tooltip: "Reminders",
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text("No Reminders")));
-            },
-          ),
-          IconButton(
-            onPressed: null,
-            icon: Icon(Icons.add),
-            tooltip: "Add Task",
-          ),
-        ],
-      ),
+      appBar: MyAppbar(pageTitle: 'Planner'),
+      drawer: AppDrawer(),
       body: TableCalendar(
         firstDay: kFirstDay,
         lastDay: kLastDay,

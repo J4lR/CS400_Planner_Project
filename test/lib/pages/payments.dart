@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test/main.dart';
+import 'package:test/components/my_appbar.dart';
 
 class OpenPayments extends StatefulWidget {
   const OpenPayments({super.key});
@@ -14,36 +14,14 @@ class _PaymentsPage extends State<OpenPayments> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
-            leading: Builder(
-              builder: (context) {
-                return IconButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MainApp()),
-                  ),
-                  icon: const Icon(Icons.arrow_back),
-                  tooltip: "Back to Home",
-                );
-              },
+          appBar: MyAppbar(pageTitle: 'Planner'),
+          drawer: AppDrawer(),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+            child: Row(children: [
+
+              ],
             ),
-            title: Text("Payments"),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.add_alert),
-                tooltip: "Reminders",
-                onPressed: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text("No Reminders")));
-                },
-              ),
-              IconButton(
-                onPressed: null,
-                icon: Icon(Icons.add),
-                tooltip: "Add Event",
-              ),
-            ],
           ),
         ),
       ),
