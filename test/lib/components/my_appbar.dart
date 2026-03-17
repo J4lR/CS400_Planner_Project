@@ -10,7 +10,7 @@ import 'package:test/pages/schedule.dart';
 import 'package:test/pages/miscevent.dart';
 
 class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const MyAppbar({required this.pageTitle});
+  const MyAppbar({super.key, required this.pageTitle});
   final String pageTitle;
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class AppDrawer extends StatelessWidget {
-  AppDrawer({super.key});
+  const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
