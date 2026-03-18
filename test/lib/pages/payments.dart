@@ -14,7 +14,7 @@ class _PaymentsPage extends State<OpenPayments> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: MyAppbar(pageTitle: 'Planner'),
+          appBar: MyAppbar(pageTitle: 'Payments'),
           drawer: AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),

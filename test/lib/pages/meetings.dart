@@ -14,7 +14,7 @@ class _MeetingsPage extends State<OpenMeetings> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: MyAppbar(pageTitle: 'Planner'),
+          appBar: MyAppbar(pageTitle: 'Meetings'),
           drawer: AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),

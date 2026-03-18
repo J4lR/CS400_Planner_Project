@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
+import 'package:test/pages/add_tast.dart';
 import 'package:test/pages/calendar.dart';
 import 'package:test/pages/appointment.dart';
-import 'package:test/pages/tasklist.dart';
+import 'package:test/pages/task_list.dart';
 import 'package:test/pages/homework.dart';
 import 'package:test/pages/meetings.dart';
 import 'package:test/pages/payments.dart';
 import 'package:test/pages/schedule.dart';
-import 'package:test/pages/miscevent.dart';
+import 'package:test/pages/misc_event.dart';
 
 class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppbar({super.key, required this.pageTitle});
@@ -37,14 +38,25 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
             ).showSnackBar(const SnackBar(content: Text("No Reminders")));
           },
         ),
-        IconButton(onPressed: null, icon: Icon(Icons.add), tooltip: "Add Task"),
+        IconButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AddTask();
+              },
+            );
+          },
+          icon: Icon(Icons.add),
+          tooltip: "Add Task",
+        ),
       ],
       backgroundColor: const Color.fromARGB(255, 55, 102, 231),
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(16.0);
+  Size get preferredSize => Size.fromHeight(150.0);
 }
 
 class AppDrawer extends StatelessWidget {

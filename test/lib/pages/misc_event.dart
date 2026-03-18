@@ -14,7 +14,7 @@ class _MiscEventPage extends State<OpenMiscEvent> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: MyAppbar(pageTitle: 'Planner'),
+          appBar: MyAppbar(pageTitle: 'Miscellaneous Events'),
           drawer: AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),

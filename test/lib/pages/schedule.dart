@@ -14,7 +14,7 @@ class _SchedulePage extends State<OpenSchedule> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: MyAppbar(pageTitle: 'Planner'),
+          appBar: MyAppbar(pageTitle: 'Schedule'),
           drawer: AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test/components/date_model.dart';
 import 'package:test/components/my_appbar.dart';
 import 'package:test/pages/calendar.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => DateModel(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

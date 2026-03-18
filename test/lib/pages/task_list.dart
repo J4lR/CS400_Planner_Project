@@ -14,7 +14,7 @@ class _TaskListPage extends State<OpenTaskList> {
     return MaterialApp(
       home: SafeArea(
         child: Scaffold(
-          appBar: MyAppbar(pageTitle: 'Planner'),
+          appBar: MyAppbar(pageTitle: 'Task List'),
           drawer: AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),
