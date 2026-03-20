@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test/main.dart';
-import 'package:test/pages/add_tast.dart';
+import 'package:test/pages/add_task.dart';
 import 'package:test/pages/calendar.dart';
 import 'package:test/pages/appointment.dart';
 import 'package:test/pages/task_list.dart';
@@ -43,7 +43,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
             showDialog(
               context: context,
               builder: (context) {
-                return AddTask();
+                return AddTask(getPage: pageTitle);
               },
             );
           },
@@ -56,7 +56,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(150.0);
+  Size get preferredSize => Size.fromHeight(100.0);
 }
 
 class AppDrawer extends StatelessWidget {

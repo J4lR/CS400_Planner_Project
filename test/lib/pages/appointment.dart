@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test/components/my_appbar.dart';
+import 'package:test/components/my_searchbar.dart';
 
 class OpenAppointment extends StatefulWidget {
   const OpenAppointment({super.key});
@@ -16,13 +17,7 @@ class _AppointmentPage extends State<OpenAppointment> {
         child: Scaffold(
           appBar: MyAppbar(pageTitle: 'Appointments'),
           drawer: AppDrawer(),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50.0),
-            child: Row(children: [
-
-              ],
-            ),
-          ),
+          body: Row(children: [searchbox()]),
         ),
       ),
     );

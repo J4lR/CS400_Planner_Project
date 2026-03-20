@@ -31,7 +31,7 @@ class _CalenderTest extends State<TableCalenderTest> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedDate = context.watch<DateModel>().selectedDate;
+    //final selectedDate = context.watch<DateModel>().selectedDate;
     return Provider<DateModel>(
       create: (_) => DateModel(),
       builder: (context, child) {
