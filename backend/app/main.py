@@ -6,8 +6,17 @@ from app.db import init_db, get_db
 from typing import Optional
 from app.models import Task, User
 from app.auth import hash_password, verify_password
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1)
