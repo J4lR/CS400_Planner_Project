@@ -45,7 +45,7 @@ void initState() {
 
     final today = await getTasks(filter: 'today');
     final upcoming = await getTasks(filter: 'upcoming');
-    final completed = await getTasks(filter: 'completed');
+    final completed = await getTasks(filter: 'today');
 
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     final tomorrowStr =
@@ -61,7 +61,7 @@ void initState() {
         final date = DateTime.parse(t['due_date']);
         return date.isAfter(tomorrow) && date.isBefore(nextWeek);
       }).toList();
-      _completedTasks = completed;
+      _completedTasks = completed.where((t) => t['completed'] == true).toList();
       _isLoading = false;
     });
   }
@@ -197,13 +197,7 @@ final pages = _pages;
                         const Color(0xFF3B82F6),
                         isDark)),
                 const SizedBox(width: 12),
-                Expanded(
-                    child: _buildStatCard(
-                        'Completed',
-                        _completedTasks.length.toString(),
-                        Icons.check_circle,
-                        const Color(0xFF22C55E),
-                        isDark)),
+                Expanded(child: _buildStatCard('Completed', _completedTasks.length.toString(), Icons.check_circle, const Color(0xFF22C55E), isDark)),
                 const SizedBox(width: 12),
                 Expanded(
                     child: _buildStatCard(
@@ -229,8 +223,7 @@ final pages = _pages;
                       const SizedBox(height: 24),
                       _buildSection('Due This Week', _weekTasks, isDark),
                       const SizedBox(height: 24),
-                      _buildSection(
-                          'Recently Completed', _completedTasks, isDark),
+                      _buildSection('Completed Today', _completedTasks, isDark),
                       const SizedBox(height: 24),
                     ],
                   ),
