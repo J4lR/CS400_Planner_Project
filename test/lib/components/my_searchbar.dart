@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
 
-Widget searchbox() {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-    child: TextField(
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(0),
-        prefixIcon: Icon(Icons.search, color: Colors.black, size: 20),
-        prefixIconConstraints: BoxConstraints(maxHeight: 20, maxWidth: 25),
-        border: InputBorder.none,
-        hintText: 'Search',
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+class MySearchbar extends StatefulWidget {
+  const MySearchbar({super.key});
+
+  @override
+  State<MySearchbar> createState() => _MySearchbar();
+}
+
+class _MySearchbar extends State<MySearchbar> {
+  bool isDark = false;
+  @override
+  Widget build(BuildContext context) {
+    return SearchAnchor(
+      builder: (BuildContext constext, SearchController controller) {
+        return SearchBar(
+          controller: controller,
+          padding: const WidgetStatePropertyAll<EdgeInsets>(
+            EdgeInsets.symmetric(horizontal: 16.0),
+          ),
+          onTap: () {
+            controller.openView();
+          },
+          onChanged: (_) {
+            controller.openView();
+          },
+          leading: const Icon(Icons.search),
+        );
+      },
+      suggestionsBuilder:
+          (BuildContext context, SearchController controller) {},
+    );
+  }
 }

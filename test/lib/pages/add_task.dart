@@ -30,12 +30,13 @@ class _AddTaskPage extends State<AddTask> {
           content: Padding(
             padding: EdgeInsets.all(10),
             child: TextField(controller: _editingController),
+            //Needs to include an on changed
           ),
           actions: [
             Center(
               child: Column(
                 children: [
-                  UseEventDDm(),
+                  UseEventDDm(typeofEvent: eventType),
                   UsePriorityDDM(),
                   DatePickerScreen(),
                   Row(
