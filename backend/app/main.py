@@ -5,10 +5,13 @@ from sqlalchemy.orm import Session
 from app.db import init_db, get_db
 from typing import Optional
 from app.models import Task, User
-from app.auth import hash_password, verify_password
+from app.auth import hash_password, verify_password, create_token, decode_token
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 
 app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 app.add_middleware(
     CORSMiddleware,
@@ -80,6 +83,23 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = decode_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user_id = payload.get("user_id")
+    if user_id is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
+
 @app.on_event("startup")
 def on_startup():
     init_db()
@@ -94,15 +114,14 @@ def root():
 def get_tasks(
     category: Optional[str] = None,
     filter: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    query = db.query(Task)
+    query = db.query(Task).filter(Task.user_id == current_user.id)
 
-    # Filter by category
     if category:
         query = query.filter(Task.category == category)
 
-    # Filter by date
     if filter == "today":
         today = date.today().isoformat()
         query = query.filter(Task.due_date == today)
@@ -117,14 +136,15 @@ def get_tasks(
 
 
 @app.post("/tasks")
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     new_task = Task(
         title=task.title,
         due_date=task.due_date.isoformat(),
         completed=task.completed,
         category=task.category,
         description=task.description,
-        repeats=task.repeats
+        repeats=task.repeats,
+        user_id=current_user.id
     )
     db.add(new_task)
     db.commit()
@@ -133,8 +153,8 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
 
 @app.patch("/tasks/{task_id}")
-def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
-    existing = db.query(Task).filter(Task.id == task_id).first()
+def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    existing = db.query(Task).filter(Task.id == task_id, Task.user_id == current_user.id).first()
 
     if not existing:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -158,8 +178,8 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 @app.delete("/tasks/{task_id}")
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    existing = db.query(Task).filter(Task.id == task_id).first()
+def delete_task(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    existing = db.query(Task).filter(Task.id == task_id, Task.user_id == current_user.id).first()
 
     if not existing:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -167,6 +187,7 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(existing)
     db.commit()
     return {"message": f"Task {task_id} deleted"}
+
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -195,4 +216,5 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     if not verify_password(user.password, existing.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
-    return {"message": f"Welcome back {existing.username}!"}
+    token = create_token({"user_id": existing.id})
+    return {"access_token": token, "token_type": "bearer", "username": existing.username}
