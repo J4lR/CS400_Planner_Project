@@ -1,181 +1,42 @@
 import 'package:flutter/material.dart';
-//import 'package:table_calendar/table_calendar.dart';
-//import 'package:intl/date_symbol_data_local.dart';
-import 'package:planner/pages/calendar.dart';
-import 'package:planner/pages/appointment.dart';
-import 'package:planner/pages/tasklist.dart';
-import 'package:planner/pages/homework.dart';
-import 'package:planner/pages/meetings.dart';
-import 'package:planner/pages/payments.dart';
-import 'package:planner/pages/schedule.dart';
-import 'package:planner/pages/miscevent.dart';
+import 'package:planner/theme.dart';
+import 'package:planner/pages/login.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(const TasklyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class TasklyApp extends StatefulWidget {
+  const TasklyApp({super.key});
 
-  static const appTitle = 'Planner';
+  static _TasklyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_TasklyAppState>();
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: appTitle,
-      home: MainPage(title: appTitle),
-    );
+  State<TasklyApp> createState() => _TasklyAppState();
+}
+
+class _TasklyAppState extends State<TasklyApp> {
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  void toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    });
   }
-}
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key, required this.title});
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
 
-  final String title;
-
-  @override
-  State<MainPage> createState() => _MainPage();
-}
-
-class _MainPage extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            leading: Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu),
-                  tooltip: "Navigation Menu",
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                );
-              },
-            ),
-            title: Text(widget.title),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.add_alert),
-                tooltip: "Reminders",
-                onPressed: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text("No Reminders")));
-                },
-              ),
-              IconButton(
-                onPressed: null,
-                icon: Icon(Icons.add),
-                tooltip: "Add Task",
-              ),
-            ],
-            backgroundColor: const Color.fromARGB(255, 55, 102, 231),
-          ),
-          drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                const DrawerHeader(child: Text("Pages")),
-                ListTile(
-                  title: const Text("Calendar"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TableCalenderTest(),
-                    ),
-                  ),
-                  // Opens Calendar Page
-                ),
-                ListTile(
-                  title: const Text("Appointments"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenAppointment()),
-                  ),
-                  // Opens Appointment page
-                ),
-                ListTile(
-                  title: const Text("Task List"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenTaskList()),
-                  ),
-                  //Opens Task List Page
-                ),
-                ListTile(
-                  title: const Text("Homework"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenHomework()),
-                  ),
-                  //Opens Homework page
-                ),
-                ListTile(
-                  title: const Text("Meetings"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenMeetings()),
-                  ),
-                  //Opens Meetings page
-                ),
-                ListTile(
-                  title: const Text("Schedule"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenSchedule()),
-                  ),
-                  // Opens Schedule page
-                ),
-                ListTile(
-                  title: const Text("Payments"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenPayments()),
-                  ),
-                  //Opens Payment page
-                ),
-                ListTile(
-                  title: const Text("Misc. Events"),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OpenMiscEvent()),
-                  ),
-                  //Opens Misc. Events page
-                ),
-              ],
-            ),
-          ),
-          body: Column(
-            children: [
-              //Should be in a stateful widget since the task will be constantly updating
-              Container(
-                color: Color.fromARGB(253, 6, 30, 151),
-                width: 300.0,
-                alignment: Alignment.center,
-                child: Title(color: Colors.white, child: Text('Task List')),
-              ),
-              Container(
-                //using GestureDetectors to create unique buttons with containers
-                color: Colors.blue,
-                width: 300.0,
-                height: 50,
-                alignment: Alignment.topRight,
-                child: Center(child: Text("Task")),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const TableCalenderTest()),
-                ),
-                child: const Text('View All Task'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      title: 'Taskly',
+      debugShowCheckedModeBanner: false,
+      theme: TasklyTheme.lightTheme,
+      darkTheme: TasklyTheme.darkTheme,
+      themeMode: _themeMode,
+      home: const LoginPage(),
     );
   }
 }
