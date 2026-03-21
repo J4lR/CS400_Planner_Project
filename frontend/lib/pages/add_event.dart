@@ -16,6 +16,13 @@ class _AddEventPageState extends State<AddEventPage> {
   bool _repeats = false;
   bool _isLoading = false;
   String? _errorMessage;
+  String _selectedPriority = 'medium';
+
+  final List<Map<String, dynamic>> _priorities = [
+    {'value': 'low', 'label': 'Low', 'color': Color(0xFF22C55E)},
+    {'value': 'medium', 'label': 'Medium', 'color': Color(0xFFF59E0B)},
+    {'value': 'high', 'label': 'High', 'color': Color(0xFFEF4444)},
+  ];
 
   final List<Map<String, dynamic>> _categories = [
     {'value': 'task', 'label': 'Task', 'icon': Icons.task_alt, 'color': Color(0xFF3B82F6)},
@@ -54,6 +61,7 @@ class _AddEventPageState extends State<AddEventPage> {
       'due_date': _selectedDate.toIso8601String().split('T')[0],
       'completed': false,
       'repeats': _repeats,
+      'priority': _selectedPriority,
     });
 
     setState(() => _isLoading = false);
@@ -148,6 +156,40 @@ class _AddEventPageState extends State<AddEventPage> {
                         const SizedBox(width: 4),
                         Text(cat['label'], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isSelected ? color : (isDark ? Colors.white : const Color(0xFF1F2937)))),
                       ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 24),
+
+            // Priority
+            Text('Priority', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1F2937))),
+            const SizedBox(height: 12),
+            Row(
+              children: _priorities.map((p) {
+                final isSelected = _selectedPriority == p['value'];
+                final color = p['color'] as Color;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedPriority = p['value']),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isSelected ? color.withOpacity(0.15) : (isDark ? const Color(0xFF161B22) : Colors.white),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isSelected ? color : (isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)), width: isSelected ? 2 : 1),
+                      ),
+                      child: Text(
+                        p['label'],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? color : (isDark ? Colors.white : const Color(0xFF1F2937)),
+                        ),
+                      ),
                     ),
                   ),
                 );
