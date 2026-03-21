@@ -249,7 +249,7 @@ class _AddEventPageState extends State<AddEventPage> {
                   Switch(
                     value: _repeats,
                     onChanged: (val) => setState(() => _repeats = val),
-                    activeColor: const Color(0xFF3B82F6),
+                    activeThumbColor: const Color(0xFF3B82F6),
                   ),
                 ],
               ),
