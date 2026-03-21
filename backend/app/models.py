@@ -15,6 +15,7 @@ class Task(Base):
     description = Column(String, nullable=True)
     repeats = Column(Boolean, default=False)
     user_id = Column(Integer, nullable=True)
+    priority = Column(String, default="medium")
 
 
 class User(Base):

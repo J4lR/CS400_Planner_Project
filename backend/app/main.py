@@ -28,6 +28,7 @@ class TaskCreate(BaseModel):
     category: str = "task"
     description: Optional[str] = None
     repeats: bool = False
+    priority: str = "medium"
 
     @field_validator("title")
     @classmethod
@@ -45,6 +46,14 @@ class TaskCreate(BaseModel):
             raise ValueError(f"Category must be one of: {allowed}")
         return v
 
+    @field_validator("priority")
+    @classmethod
+    def priority_must_be_valid(cls, v: str) -> str:
+        allowed = ["low", "medium", "high"]
+        if v not in allowed:
+            raise ValueError(f"Priority must be one of: {allowed}")
+        return v
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -53,6 +62,7 @@ class TaskUpdate(BaseModel):
     category: Optional[str] = None
     description: Optional[str] = None
     repeats: Optional[bool] = None
+    priority: Optional[str] = None
 
     @field_validator("title")
     @classmethod
@@ -140,6 +150,7 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: U
         category=task.category,
         description=task.description,
         repeats=task.repeats,
+        priority=task.priority,
         user_id=current_user.id
     )
     db.add(new_task)
@@ -167,6 +178,8 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db), c
         existing.description = task.description
     if task.repeats is not None:
         existing.repeats = task.repeats
+    if task.priority is not None:
+        existing.priority = task.priority
 
     db.commit()
     db.refresh(existing)
