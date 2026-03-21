@@ -154,6 +154,7 @@ def get_tasks(
         }
 
         result.append(task_dict)
+        print(f"Task: {task.title}, repeat_type: {task.repeat_type}, repeats: {task.repeats}")
 
         # Generate future occurrences for repeating tasks
         if task.repeat_type in ("monthly", "yearly") and not task.completed:

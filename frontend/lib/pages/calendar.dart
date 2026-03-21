@@ -177,137 +177,107 @@ class _CalendarPageState extends State<CalendarPage> {
                 const Divider(height: 1),
 
                 // Selected day tasks
+                // Selected day tasks
                 Expanded(
-                  child: _selectedDay == null
-                      ? Center(
-                          child: Text(
-                            'Tap a day to see events',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: isDark
-                                  ? const Color(0xFF8B949E)
-                                  : const Color(0xFF6B7280),
-                            ),
-                          ),
-                        )
-                      : _selectedDayTasks.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.event_available,
-                                      size: 48,
-                                      color: isDark
-                                          ? const Color(0xFF8B949E)
-                                          : const Color(0xFF6B7280)),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'Nothing on this day',
+                  child: RefreshIndicator(
+                    onRefresh: _loadAllTasks,
+                    child: _selectedDay == null
+                        ? ListView(
+                            children: [
+                              SizedBox(
+                                height: 300,
+                                child: Center(
+                                  child: Text(
+                                    'Tap a day to see events',
                                     style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: isDark
-                                          ? Colors.white
-                                          : const Color(0xFF1F2937),
+                                      fontSize: 15,
+                                      color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280),
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Tap + to add an event',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: isDark
-                                          ? const Color(0xFF8B949E)
-                                          : const Color(0xFF6B7280),
+                                ),
+                              ),
+                            ],
+                          )
+                        : _selectedDayTasks.isEmpty
+                            ? ListView(
+                                children: [
+                                  SizedBox(
+                                    height: 300,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.event_available, size: 48, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            'Nothing on this day',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1F2937)),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Tap + to add an event',
+                                            style: TextStyle(fontSize: 14, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: _selectedDayTasks.length,
-                              itemBuilder: (context, index) {
-                                final task = _selectedDayTasks[index];
-                                final category = task['category'] ?? 'task';
-                                final color = _getCategoryColor(category);
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF161B22)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: isDark
-                                            ? const Color(0xFF30363D)
-                                            : const Color(0xFFE5E7EB)),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 4,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                            color: color,
-                                            borderRadius:
-                                                BorderRadius.circular(2)),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              task['title'] ?? '',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                                color: isDark
-                                                    ? Colors.white
-                                                    : const Color(0xFF1F2937),
-                                                decoration:
-                                                    task['completed'] == true
-                                                        ? TextDecoration
-                                                            .lineThrough
-                                                        : null,
-                                              ),
-                                            ),
-                                            if (task['description'] != null &&
-                                                task['description'].isNotEmpty)
-                                              Text(
-                                                task['description'],
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: isDark
-                                                        ? const Color(
-                                                            0xFF8B949E)
-                                                        : const Color(
-                                                            0xFF6B7280)),
-                                              ),
-                                          ],
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _selectedDayTasks.length,
+                                itemBuilder: (context, index) {
+                                  final task = _selectedDayTasks[index];
+                                  final category = task['category'] ?? 'task';
+                                  final color = _getCategoryColor(category);
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? const Color(0xFF161B22) : Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 40,
+                                          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
                                         ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                            color: color.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(8)),
-                                        child: Text(category,
-                                            style: TextStyle(
-                                                fontSize: 11,
-                                                color: color,
-                                                fontWeight: FontWeight.w600)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                task['title'] ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isDark ? Colors.white : const Color(0xFF1F2937),
+                                                  decoration: task['completed'] == true ? TextDecoration.lineThrough : null,
+                                                ),
+                                              ),
+                                              if (task['description'] != null && task['description'].isNotEmpty)
+                                                Text(task['description'], style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280))),
+                                              if (task['due_time'] != null)
+                                                Text(task['due_time'], style: const TextStyle(fontSize: 12, color: Color(0xFF3B82F6))),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                                          child: Text(category, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                  ),
                 ),
               ],
             ),
