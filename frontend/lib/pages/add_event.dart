@@ -13,7 +13,8 @@ class _AddEventPageState extends State<AddEventPage> {
   final _descriptionController = TextEditingController();
   String _selectedCategory = 'task';
   DateTime _selectedDate = DateTime.now();
-  bool _repeats = false;
+  TimeOfDay? _selectedTime;
+  String _repeatType = 'none';
   bool _isLoading = false;
   String? _errorMessage;
   String _selectedPriority = 'medium';
@@ -38,9 +39,24 @@ class _AddEventPageState extends State<AddEventPage> {
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      lastDate: DateTime(DateTime.now().year + 10),
     );
     if (picked != null) setState(() => _selectedDate = picked);
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? TimeOfDay.now(),
+    );
+    if (picked != null) setState(() => _selectedTime = picked);
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
   }
 
   Future<void> _save() async {
@@ -60,8 +76,10 @@ class _AddEventPageState extends State<AddEventPage> {
       'category': _selectedCategory,
       'due_date': _selectedDate.toIso8601String().split('T')[0],
       'completed': false,
-      'repeats': _repeats,
+      'repeats': _repeatType != 'none',
+      'repeat_type': _repeatType == 'none' ? null : _repeatType,
       'priority': _selectedPriority,
+      'due_time': _selectedTime != null ? _formatTime(_selectedTime!) : null,
     });
 
     setState(() => _isLoading = false);
@@ -223,38 +241,93 @@ class _AddEventPageState extends State<AddEventPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
-            // Repeats toggle
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF161B22) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.repeat, color: Color(0xFF3B82F6)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Repeats', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1F2937))),
-                        Text('This event repeats regularly', style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280))),
-                      ],
+            // Time picker (optional)
+            GestureDetector(
+              onTap: _pickTime,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF161B22) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _selectedTime != null
+                        ? const Color(0xFF3B82F6)
+                        : isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.access_time, color: _selectedTime != null ? const Color(0xFF3B82F6) : const Color(0xFF8B949E)),
+                    const SizedBox(width: 12),
+                    Text(
+                      _selectedTime != null ? _formatTime(_selectedTime!) : 'Add Time (optional)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedTime != null
+                            ? (isDark ? Colors.white : const Color(0xFF1F2937))
+                            : const Color(0xFF8B949E),
+                      ),
                     ),
-                  ),
-                  Switch(
-                    value: _repeats,
-                    onChanged: (val) => setState(() => _repeats = val),
-                    activeThumbColor: const Color(0xFF3B82F6),
-                  ),
-                ],
+                    const Spacer(),
+                    if (_selectedTime != null)
+                      GestureDetector(
+                        onTap: () => setState(() => _selectedTime = null),
+                        child: const Icon(Icons.close, size: 18, color: Color(0xFF8B949E)),
+                      )
+                    else
+                      Icon(Icons.chevron_right, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+                  ],
+                ),
               ),
             ),
+            const SizedBox(height: 24),
+
+            // Repeats
+            Text('Repeats', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1F2937))),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _repeatChip('None', 'none', isDark),
+                const SizedBox(width: 8),
+                _repeatChip('Monthly', 'monthly', isDark),
+                const SizedBox(width: 8),
+                _repeatChip('Yearly', 'yearly', isDark),
+              ],
+            ),
+            const SizedBox(height: 24),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _repeatChip(String label, String value, bool isDark) {
+    final isSelected = _repeatType == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _repeatType = value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF3B82F6).withOpacity(0.15) : (isDark ? const Color(0xFF161B22) : Colors.white),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected ? const Color(0xFF3B82F6) : (isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? const Color(0xFF3B82F6) : (isDark ? Colors.white : const Color(0xFF1F2937)),
+            ),
+          ),
         ),
       ),
     );

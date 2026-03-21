@@ -132,17 +132,69 @@ def get_tasks(
     if category:
         query = query.filter(Task.category == category)
 
-    if filter == "today":
-        today = date.today().isoformat()
-        query = query.filter(Task.due_date == today)
-    elif filter == "upcoming":
-        today = date.today().isoformat()
-        query = query.filter(Task.due_date > today)
-    elif filter == "completed":
-        query = query.filter(Task.completed == True)
-
     tasks = query.order_by(Task.due_date.asc()).all()
-    return tasks
+
+    # Build result with repeated task occurrences
+    result = []
+    today = date.today()
+
+    for task in tasks:
+        task_dict = {
+            "id": task.id,
+            "title": task.title,
+            "due_date": task.due_date,
+            "completed": task.completed,
+            "category": task.category,
+            "description": task.description,
+            "repeats": task.repeats,
+            "repeat_type": task.repeat_type,
+            "due_time": task.due_time,
+            "priority": task.priority,
+            "user_id": task.user_id,
+        }
+
+        result.append(task_dict)
+
+        # Generate future occurrences for repeating tasks
+        if task.repeat_type in ("monthly", "yearly") and not task.completed:
+            original_date = date.fromisoformat(task.due_date)
+            current_date = original_date
+
+            for _ in range(24):  # generate up to 24 future occurrences
+                if task.repeat_type == "monthly":
+                    month = current_date.month + 1
+                    year = current_date.year + (month - 1) // 12
+                    month = ((month - 1) % 12) + 1
+                    try:
+                        current_date = current_date.replace(year=year, month=month)
+                    except ValueError:
+                        break
+                elif task.repeat_type == "yearly":
+                    try:
+                        current_date = current_date.replace(year=current_date.year + 1)
+                    except ValueError:
+                        break
+
+                if current_date > today + __import__('datetime').timedelta(days=365 * 10):
+                    break
+
+                occurrence = task_dict.copy()
+                occurrence["due_date"] = current_date.isoformat()
+                occurrence["id"] = task.id  # same id so updates apply to original
+                result.append(occurrence)
+
+    # Apply filter after generating occurrences
+    if filter == "today":
+        today_str = today.isoformat()
+        result = [t for t in result if t["due_date"] == today_str]
+    elif filter == "upcoming":
+        today_str = today.isoformat()
+        result = [t for t in result if t["due_date"] > today_str]
+    elif filter == "completed":
+        result = [t for t in result if t["completed"]]
+
+    result.sort(key=lambda t: t["due_date"])
+    return result
 
 
 @app.post("/tasks")
