@@ -122,8 +122,12 @@ class _HomePageState extends State<HomePage> {
       body: pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _currentIndex = index),
+        onDestinationSelected: (index) {
+          setState(() => _currentIndex = index);
+          if (index == 0) {
+            _loadTodayTasks();
+          }
+        },
         destinations: const [
           NavigationDestination(
               icon: Icon(Icons.home_outlined),
