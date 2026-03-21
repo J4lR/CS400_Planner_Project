@@ -23,6 +23,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   List<dynamic> _todayTasks = [];
+  List<dynamic> _tomorrowTasks = [];
+  List<dynamic> _weekTasks = [];
+  List<dynamic> _completedTasks = [];
   bool _isLoading = true;
 
   @override
@@ -32,9 +35,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadTodayTasks() async {
-    final tasks = await getTasks(filter: 'today');
+    setState(() => _isLoading = true);
+
+    final today = await getTasks(filter: 'today');
+    final upcoming = await getTasks(filter: 'upcoming');
+    final completed = await getTasks(filter: 'completed');
+
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final tomorrowStr =
+        '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
+
+    final nextWeek = DateTime.now().add(const Duration(days: 7));
+
     setState(() {
-      _todayTasks = tasks;
+      _todayTasks = today;
+      _tomorrowTasks =
+          upcoming.where((t) => t['due_date'] == tomorrowStr).toList();
+      _weekTasks = upcoming.where((t) {
+        final date = DateTime.parse(t['due_date']);
+        return date.isAfter(tomorrow) && date.isBefore(nextWeek);
+      }).toList();
+      _completedTasks = completed;
       _isLoading = false;
     });
   }
@@ -66,7 +87,9 @@ class _HomePageState extends State<HomePage> {
                       text: 'Hi, ',
                       style: TextStyle(
                         fontSize: 20,
-                        color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280),
+                        color: isDark
+                            ? const Color(0xFF8B949E)
+                            : const Color(0xFF6B7280),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -99,11 +122,21 @@ class _HomePageState extends State<HomePage> {
       body: pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        onDestinationSelected: (index) =>
+            setState(() => _currentIndex = index),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.calendar_month_outlined), selectedIcon: Icon(Icons.calendar_month), label: 'Calendar'),
-          NavigationDestination(icon: Icon(Icons.check_circle_outline), selectedIcon: Icon(Icons.check_circle), label: 'Tasks'),
+          NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Home'),
+          NavigationDestination(
+              icon: Icon(Icons.calendar_month_outlined),
+              selectedIcon: Icon(Icons.calendar_month),
+              label: 'Calendar'),
+          NavigationDestination(
+              icon: Icon(Icons.check_circle_outline),
+              selectedIcon: Icon(Icons.check_circle),
+              label: 'Tasks'),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -139,7 +172,9 @@ class _HomePageState extends State<HomePage> {
               _getFormattedDate(),
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280),
+                color: isDark
+                    ? const Color(0xFF8B949E)
+                    : const Color(0xFF6B7280),
               ),
             ),
             const SizedBox(height: 24),
@@ -147,54 +182,122 @@ class _HomePageState extends State<HomePage> {
             // Stats row
             Row(
               children: [
-                Expanded(child: _buildStatCard('Total Today', _todayTasks.length.toString(), Icons.list_alt, const Color(0xFF3B82F6), isDark)),
+                Expanded(
+                    child: _buildStatCard(
+                        'Total Today',
+                        _todayTasks.length.toString(),
+                        Icons.list_alt,
+                        const Color(0xFF3B82F6),
+                        isDark)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Completed', _todayTasks.where((t) => t['completed'] == true).length.toString(), Icons.check_circle, const Color(0xFF22C55E), isDark)),
+                Expanded(
+                    child: _buildStatCard(
+                        'Completed',
+                        _completedTasks.length.toString(),
+                        Icons.check_circle,
+                        const Color(0xFF22C55E),
+                        isDark)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Pending', _todayTasks.where((t) => t['completed'] == false).length.toString(), Icons.pending, const Color(0xFFF59E0B), isDark)),
+                Expanded(
+                    child: _buildStatCard(
+                        'Pending',
+                        _todayTasks
+                            .where((t) => t['completed'] == false)
+                            .length
+                            .toString(),
+                        Icons.pending,
+                        const Color(0xFFF59E0B),
+                        isDark)),
               ],
             ),
             const SizedBox(height: 24),
 
-            // Today's tasks
-            Text(
-              "Due Today",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1F2937),
-              ),
-            ),
-            const SizedBox(height: 12),
-
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _todayTasks.isEmpty
-                    ? _buildEmptyState(isDark)
-                    : Column(
-                        children: _todayTasks.map((task) => _buildTaskCard(task, isDark)).toList(),
-                      ),
+                : Column(
+                    children: [
+                      _buildSection('Due Today', _todayTasks, isDark),
+                      const SizedBox(height: 24),
+                      _buildSection('Due Tomorrow', _tomorrowTasks, isDark),
+                      const SizedBox(height: 24),
+                      _buildSection('Due This Week', _weekTasks, isDark),
+                      const SizedBox(height: 24),
+                      _buildSection(
+                          'Recently Completed', _completedTasks, isDark),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color, bool isDark) {
+  Widget _buildSection(String title, List<dynamic> tasks, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF1F2937),
+              ),
+            ),
+            Text(
+              '${tasks.length} items',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? const Color(0xFF8B949E)
+                    : const Color(0xFF6B7280),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        tasks.isEmpty
+            ? _buildEmptyState(isDark)
+            : Column(
+                children:
+                    tasks.map((task) => _buildTaskCard(task, isDark)).toList(),
+              ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(
+      String label, String value, IconData icon, Color color, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF161B22) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
+        border: Border.all(
+            color:
+                isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
       ),
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
-          Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: isDark ? Colors.white : const Color(0xFF1F2937))),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : const Color(0xFF1F2937))),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)), textAlign: TextAlign.center),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11,
+                  color: isDark
+                      ? const Color(0xFF8B949E)
+                      : const Color(0xFF6B7280)),
+              textAlign: TextAlign.center),
         ],
       ),
     );
@@ -210,14 +313,17 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF161B22) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
+        border: Border.all(
+            color:
+                isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
       ),
       child: Row(
         children: [
           Container(
             width: 4,
             height: 40,
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(
+                color: color, borderRadius: BorderRadius.circular(2)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -230,34 +336,60 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white : const Color(0xFF1F2937),
-                    decoration: task['completed'] == true ? TextDecoration.lineThrough : null,
+                    decoration: task['completed'] == true
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
                 ),
-                if (task['description'] != null && task['description'].isNotEmpty)
+                if (task['description'] != null &&
+                    task['description'].isNotEmpty)
                   Text(
                     task['description'],
-                    style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? const Color(0xFF8B949E)
+                            : const Color(0xFF6B7280)),
                   ),
+                const SizedBox(height: 4),
+                Text(
+                  task['due_date'] ?? '',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? const Color(0xFF8B949E)
+                          : const Color(0xFF6B7280)),
+                ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(category, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+            child: Text(category,
+                style: TextStyle(
+                    fontSize: 11,
+                    color: color,
+                    fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 8),
           GestureDetector(
             onTap: () async {
-              await updateTask(task['id'], {'completed': !task['completed']});
+              await updateTask(
+                  task['id'], {'completed': !task['completed']});
               _loadTodayTasks();
             },
             child: Icon(
-              task['completed'] == true ? Icons.check_circle : Icons.circle_outlined,
-              color: task['completed'] == true ? const Color(0xFF22C55E) : const Color(0xFF8B949E),
+              task['completed'] == true
+                  ? Icons.check_circle
+                  : Icons.circle_outlined,
+              color: task['completed'] == true
+                  ? const Color(0xFF22C55E)
+                  : const Color(0xFF8B949E),
             ),
           ),
         ],
@@ -267,24 +399,29 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEmptyState(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF161B22) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
+        border: Border.all(
+            color:
+                isDark ? const Color(0xFF30363D) : const Color(0xFFE5E7EB)),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Icon(Icons.check_circle_outline, size: 48, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
-          const SizedBox(height: 12),
+          Icon(Icons.check_circle_outline,
+              size: 24,
+              color: isDark
+                  ? const Color(0xFF8B949E)
+                  : const Color(0xFF6B7280)),
+          const SizedBox(width: 12),
           Text(
-            'Nothing due today!',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1F2937)),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Tap + to add a new event',
-            style: TextStyle(fontSize: 14, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+            'Nothing here',
+            style: TextStyle(
+                fontSize: 14,
+                color: isDark
+                    ? const Color(0xFF8B949E)
+                    : const Color(0xFF6B7280)),
           ),
         ],
       ),
@@ -299,14 +436,28 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: const EdgeInsets.all(24),
               width: double.infinity,
-              color: isDark ? const Color(0xFF161B22) : const Color(0xFFF6F8FA),
+              color: isDark
+                  ? const Color(0xFF161B22)
+                  : const Color(0xFFF6F8FA),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.check_circle_rounded, size: 40, color: Theme.of(context).primaryColor),
+                  Icon(Icons.check_circle_rounded,
+                      size: 40, color: Theme.of(context).primaryColor),
                   const SizedBox(height: 8),
-                  Text('Taskly', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: isDark ? Colors.white : const Color(0xFF1F2937))),
-                  Text('Hi, ${widget.username}', style: TextStyle(fontSize: 14, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280))),
+                  Text('Taskly',
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1F2937))),
+                  Text('Hi, ${widget.username}',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: isDark
+                              ? const Color(0xFF8B949E)
+                              : const Color(0xFF6B7280))),
                 ],
               ),
             ),
@@ -314,15 +465,23 @@ class _HomePageState extends State<HomePage> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
-                  _drawerItem(Icons.task_alt, 'Tasks', () => _navigateTo(const TasksPage())),
-                  _drawerItem(Icons.school_outlined, 'Homework', () => _navigateTo(const HomeworkPage())),
-                  _drawerItem(Icons.event_outlined, 'Appointments', () => _navigateTo(const AppointmentPage())),
-                  _drawerItem(Icons.groups_outlined, 'Meetings', () => _navigateTo(const MeetingsPage())),
-                  _drawerItem(Icons.payments_outlined, 'Payments', () => _navigateTo(const PaymentsPage())),
-                  _drawerItem(Icons.schedule_outlined, 'Schedule', () => _navigateTo(const SchedulePage())),
-                  _drawerItem(Icons.more_horiz, 'Other', () => _navigateTo(const OtherPage())),
+                  _drawerItem(Icons.task_alt, 'Tasks',
+                      () => _navigateTo(const TasksPage())),
+                  _drawerItem(Icons.school_outlined, 'Homework',
+                      () => _navigateTo(const HomeworkPage())),
+                  _drawerItem(Icons.event_outlined, 'Appointments',
+                      () => _navigateTo(const AppointmentPage())),
+                  _drawerItem(Icons.groups_outlined, 'Meetings',
+                      () => _navigateTo(const MeetingsPage())),
+                  _drawerItem(Icons.payments_outlined, 'Payments',
+                      () => _navigateTo(const PaymentsPage())),
+                  _drawerItem(Icons.schedule_outlined, 'Schedule',
+                      () => _navigateTo(const SchedulePage())),
+                  _drawerItem(Icons.more_horiz, 'Other',
+                      () => _navigateTo(const OtherPage())),
                   const Divider(),
-                  _drawerItem(Icons.logout, 'Logout', _logout, color: const Color(0xFFEF4444)),
+                  _drawerItem(Icons.logout, 'Logout', _logout,
+                      color: const Color(0xFFEF4444)),
                 ],
               ),
             ),
@@ -332,11 +491,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {Color? color}) {
+  Widget _drawerItem(IconData icon, String label, VoidCallback onTap,
+      {Color? color}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
-      leading: Icon(icon, color: color ?? (isDark ? Colors.white : const Color(0xFF1F2937))),
-      title: Text(label, style: TextStyle(color: color ?? (isDark ? Colors.white : const Color(0xFF1F2937)), fontWeight: FontWeight.w500)),
+      leading: Icon(icon,
+          color: color ??
+              (isDark ? Colors.white : const Color(0xFF1F2937))),
+      title: Text(label,
+          style: TextStyle(
+              color: color ??
+                  (isDark ? Colors.white : const Color(0xFF1F2937)),
+              fontWeight: FontWeight.w500)),
       onTap: () {
         Navigator.pop(context);
         onTap();
@@ -350,19 +516,46 @@ class _HomePageState extends State<HomePage> {
 
   Color _getCategoryColor(String category) {
     switch (category) {
-      case 'homework': return const Color(0xFF8B5CF6);
-      case 'payment': return const Color(0xFF22C55E);
-      case 'meeting': return const Color(0xFF3B82F6);
-      case 'appointment': return const Color(0xFFF59E0B);
-      case 'misc': return const Color(0xFF6B7280);
-      default: return const Color(0xFF3B82F6);
+      case 'homework':
+        return const Color(0xFF8B5CF6);
+      case 'payment':
+        return const Color(0xFF22C55E);
+      case 'meeting':
+        return const Color(0xFF3B82F6);
+      case 'appointment':
+        return const Color(0xFFF59E0B);
+      case 'misc':
+        return const Color(0xFF6B7280);
+      default:
+        return const Color(0xFF3B82F6);
     }
   }
 
   String _getFormattedDate() {
     final now = DateTime.now();
-    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
     return '${days[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
   }
 }

@@ -18,6 +18,11 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _errorMessage;
 
   Future<void> _register() async {
+    if (!_isPasswordValid(_passwordController.text)) {
+      setState(() => _errorMessage = 'Password does not meet requirements');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -45,6 +50,36 @@ class _RegisterPageState extends State<RegisterPage> {
     } else {
       setState(() => _errorMessage = result['message']);
     }
+  }
+
+  bool _isPasswordValid(String password) {
+    return password.length >= 6 &&
+        password.contains(RegExp(r'[A-Z]')) &&
+        password.contains(RegExp(r'[0-9]')) &&
+        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+  }
+
+  Widget _passwordHint(String text, bool isValid) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(
+            isValid ? Icons.check_circle : Icons.circle_outlined,
+            size: 14,
+            color: isValid ? const Color(0xFF22C55E) : const Color(0xFF8B949E),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: isValid ? const Color(0xFF22C55E) : const Color(0xFF8B949E),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -127,6 +162,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  onChanged: (val) => setState(() {}),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outline),
@@ -134,6 +170,21 @@ class _RegisterPageState extends State<RegisterPage> {
                       icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Password hints
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _passwordHint('At least 6 characters', _passwordController.text.length >= 6),
+                      _passwordHint('One uppercase letter', _passwordController.text.contains(RegExp(r'[A-Z]'))),
+                      _passwordHint('One number', _passwordController.text.contains(RegExp(r'[0-9]'))),
+                      _passwordHint('One special character (!@#\$%)', _passwordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
