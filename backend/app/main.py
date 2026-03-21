@@ -29,6 +29,8 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     repeats: bool = False
     priority: str = "medium"
+    due_time: Optional[str] = None
+    repeat_type: Optional[str] = None
 
     @field_validator("title")
     @classmethod
@@ -63,6 +65,8 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = None
     repeats: Optional[bool] = None
     priority: Optional[str] = None
+    due_time: Optional[str] = None
+    repeat_type: Optional[str] = None
 
     @field_validator("title")
     @classmethod
@@ -151,6 +155,8 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: U
         description=task.description,
         repeats=task.repeats,
         priority=task.priority,
+        due_time=task.due_time,
+        repeat_type=task.repeat_type,
         user_id=current_user.id
     )
     db.add(new_task)
@@ -180,6 +186,10 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db), c
         existing.repeats = task.repeats
     if task.priority is not None:
         existing.priority = task.priority
+    if task.due_time is not None:
+        existing.due_time = task.due_time
+    if task.repeat_type is not None:
+        existing.repeat_type = task.repeat_type
 
     db.commit()
     db.refresh(existing)

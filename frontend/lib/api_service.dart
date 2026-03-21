@@ -36,8 +36,10 @@ Future<Map<String, dynamic>> register(String username, String email, String pass
 
 Future<List<dynamic>> getTasks({String? category, String? filter}) async {
   String url = '$baseUrl/tasks';
-  if (category != null) url += '?category=$category';
-  if (filter != null) url += '?filter=$filter';
+  List<String> params = [];
+  if (category != null) params.add('category=$category');
+  if (filter != null) params.add('filter=$filter');
+  if (params.isNotEmpty) url += '?${params.join('&')}';
   final response = await http.get(
     Uri.parse(url),
     headers: {'Authorization': 'Bearer $authToken'},

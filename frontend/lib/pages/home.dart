@@ -187,15 +187,18 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 24),
 
             // Stats row
-            Row(
-              children: [
-                Expanded(child: _buildStatCard('Total Today', totalToday.toString(), Icons.list_alt, const Color(0xFF3B82F6), isDark)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Today Done', completedToday.toString(), Icons.check_circle, const Color(0xFF22C55E), isDark)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Pending', pendingToday.toString(), Icons.pending, const Color(0xFFF59E0B), isDark)),
-              ],
-            ),
+            // Stats row
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Row(
+                    children: [
+                      Expanded(child: _buildStatCard('Total Today', totalToday.toString(), Icons.list_alt, const Color(0xFF3B82F6), isDark)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatCard('Today Done', completedToday.toString(), Icons.check_circle, const Color(0xFF22C55E), isDark)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatCard('Pending', pendingToday.toString(), Icons.pending, const Color(0xFFF59E0B), isDark)),
+                    ],
+                  ),
             const SizedBox(height: 24),
 
             _isLoading
@@ -391,7 +394,7 @@ class _HomePageState extends State<HomePage> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
-                  _drawerItem(Icons.task_alt, 'Tasks', () => _navigateTo(const TasksPage())),
+                  _drawerItem(Icons.task_alt, 'Tasks', () => _navigateTo(TasksPage(onTaskUpdated: _loadTodayTasks))),
                   _drawerItem(Icons.school_outlined, 'Homework', () => _navigateTo(const HomeworkPage())),
                   _drawerItem(Icons.event_outlined, 'Appointments', () => _navigateTo(const AppointmentPage())),
                   _drawerItem(Icons.groups_outlined, 'Meetings', () => _navigateTo(const MeetingsPage())),

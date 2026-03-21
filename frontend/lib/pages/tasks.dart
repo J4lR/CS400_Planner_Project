@@ -170,34 +170,37 @@ class _TasksPageState extends State<TasksPage> {
                                     if (task['description'] != null && task['description'].isNotEmpty)
                                       Text(task['description'], style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280))),
                                     const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.calendar_today, size: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          task['due_date'] ?? '',
-                                          style: TextStyle(fontSize: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                                          child: Text(category, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600)),
-                                        ),
-                                        if (isOverdue) ...[
-                                          const SizedBox(width: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(color: const Color(0xFFEF4444).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                                            child: const Text('Overdue', style: TextStyle(fontSize: 10, color: Color(0xFFEF4444), fontWeight: FontWeight.w600)),
-                                          ),
-                                        ],
-                                        if (task['repeats'] == true) ...[
-                                          const SizedBox(width: 8),
-                                          const Icon(Icons.repeat, size: 12, color: Color(0xFF8B949E)),
-                                        ],
-                                      ],
-                                    ),
+                                    Wrap(
+  spacing: 8,
+  runSpacing: 4,
+  crossAxisAlignment: WrapCrossAlignment.center,
+  children: [
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.calendar_today, size: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
+        const SizedBox(width: 4),
+        Text(
+          task['due_date'] ?? '',
+          style: TextStyle(fontSize: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
+        ),
+      ],
+    ),
+    Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+      child: Text(category, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600)),
+    ),
+    if (isOverdue)
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(color: const Color(0xFFEF4444).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+        child: const Text('Overdue', style: TextStyle(fontSize: 10, color: Color(0xFFEF4444), fontWeight: FontWeight.w600)),
+      ),
+    if (task['repeats'] == true)
+      const Icon(Icons.repeat, size: 12, color: Color(0xFF8B949E)),
+  ],
+),
                                   ],
                                 ),
                                 trailing: IconButton(
