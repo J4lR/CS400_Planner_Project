@@ -3,7 +3,8 @@ import 'package:planner/api_service.dart';
 import 'package:planner/pages/add_event.dart';
 
 class TasksPage extends StatefulWidget {
-  const TasksPage({super.key});
+  final VoidCallback? onTaskUpdated;
+  const TasksPage({super.key, this.onTaskUpdated});
 
   @override
   State<TasksPage> createState() => _TasksPageState();
@@ -42,11 +43,13 @@ class _TasksPageState extends State<TasksPage> {
   Future<void> _deleteTask(int id) async {
     await deleteTask(id);
     _loadTasks();
+    widget.onTaskUpdated?.call();
   }
 
   Future<void> _toggleComplete(dynamic task) async {
     await updateTask(task['id'], {'completed': !task['completed']});
     _loadTasks();
+    widget.onTaskUpdated?.call();
   }
 
   Color _getCategoryColor(String category) {

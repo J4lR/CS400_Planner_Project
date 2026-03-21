@@ -27,12 +27,18 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> _weekTasks = [];
   List<dynamic> _completedTasks = [];
   bool _isLoading = true;
+  late List<Widget> _pages;
 
   @override
-  void initState() {
-    super.initState();
-    _loadTodayTasks();
-  }
+void initState() {
+  super.initState();
+  _pages = [
+    Container(),
+    const CalendarPage(),
+    TasksPage(onTaskUpdated: _loadTodayTasks),
+  ];
+  _loadTodayTasks();
+}
 
   Future<void> _loadTodayTasks() async {
     setState(() => _isLoading = true);
@@ -71,11 +77,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final pages = [
-      _buildDashboard(isDark),
-      const CalendarPage(),
-      const TasksPage(),
-    ];
+    _pages[0] = _buildDashboard(isDark);
+final pages = _pages;
 
     return Scaffold(
       appBar: AppBar(
