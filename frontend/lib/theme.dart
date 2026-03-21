@@ -24,7 +24,7 @@ class TasklyTheme {
         fontWeight: FontWeight.w600,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF161B22),
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -83,7 +83,7 @@ class TasklyTheme {
         fontWeight: FontWeight.w600,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(

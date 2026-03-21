@@ -118,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outline),
+                    prefixIcon: Icon(Icons.email),
                   ),
                 ),
                 const SizedBox(height: 16),
