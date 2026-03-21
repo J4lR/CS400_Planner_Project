@@ -7,7 +7,7 @@ from typing import Optional
 from app.models import Task, User
 from app.auth import hash_password, verify_password, create_token, decode_token
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 app = FastAPI()
 
@@ -78,10 +78,6 @@ class UserCreate(BaseModel):
     username: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -207,13 +203,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.username == user.username).first()
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.username == form_data.username).first()
     
     if not existing:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
-    if not verify_password(user.password, existing.password):
+    if not verify_password(form_data.password, existing.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
     token = create_token({"user_id": existing.id})
