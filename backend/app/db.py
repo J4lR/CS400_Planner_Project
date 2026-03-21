@@ -5,9 +5,10 @@ from app.models import Base
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./app/planner.db")
 
-# Render gives postgres:// but SQLAlchemy needs postgresql://
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 # Only add check_same_thread for SQLite (local dev)
 if DATABASE_URL.startswith("sqlite"):
