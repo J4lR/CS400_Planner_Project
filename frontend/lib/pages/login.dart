@@ -54,29 +54,9 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Logo and title
-                Icon(
-                  Icons.check_circle_rounded,
-                  size: 72,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Taskly',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1F2937),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Stay organized, stay ahead.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280),
-                  ),
+                Image.asset(
+                  'assets/logo.png',
+                  height: 200,
                 ),
                 const SizedBox(height: 48),
 

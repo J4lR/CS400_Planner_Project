@@ -95,10 +95,9 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(
-                  Icons.check_circle_rounded,
-                  size: 72,
-                  color: Theme.of(context).primaryColor,
+                Image.asset(
+                  'assets/logo.png',
+                  height: 120,
                 ),
                 const SizedBox(height: 16),
                 Text(
