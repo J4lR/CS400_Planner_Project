@@ -1,7 +1,7 @@
 //By aleksanderwozniak
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:test/utils.dart';
+import 'package:planner/utils.dart';
 
 class TableCalenderTest extends StatefulWidget {
   const TableCalenderTest({super.key});

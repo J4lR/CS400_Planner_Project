@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test/main.dart';
+import 'package:planner/main.dart';
 
 class OpenHomework extends StatefulWidget {
   const OpenHomework({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test/main.dart';
+import 'package:planner/main.dart';
 
 class OpenSchedule extends StatefulWidget {
   const OpenSchedule({super.key});

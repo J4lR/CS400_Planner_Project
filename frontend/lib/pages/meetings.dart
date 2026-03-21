@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test/main.dart';
+import 'package:planner/main.dart';
 
 class OpenMeetings extends StatefulWidget {
   const OpenMeetings({super.key});

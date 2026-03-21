@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 //import 'package:table_calendar/table_calendar.dart';
 //import 'package:intl/date_symbol_data_local.dart';
-import 'package:test/pages/calendar.dart';
-import 'package:test/pages/appointment.dart';
-import 'package:test/pages/tasklist.dart';
-import 'package:test/pages/homework.dart';
-import 'package:test/pages/meetings.dart';
-import 'package:test/pages/payments.dart';
-import 'package:test/pages/schedule.dart';
-import 'package:test/pages/miscevent.dart';
+import 'package:planner/pages/calendar.dart';
+import 'package:planner/pages/appointment.dart';
+import 'package:planner/pages/tasklist.dart';
+import 'package:planner/pages/homework.dart';
+import 'package:planner/pages/meetings.dart';
+import 'package:planner/pages/payments.dart';
+import 'package:planner/pages/schedule.dart';
+import 'package:planner/pages/miscevent.dart';
 
 void main() {
   runApp(MainApp());
