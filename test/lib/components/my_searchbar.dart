@@ -27,8 +27,9 @@ class _MySearchbar extends State<MySearchbar> {
           leading: const Icon(Icons.search),
         );
       },
-      suggestionsBuilder:
-          (BuildContext context, SearchController controller) {},
+      suggestionsBuilder: (BuildContext context, SearchController controller) {
+        throw context;
+      },
     );
   }
 }
