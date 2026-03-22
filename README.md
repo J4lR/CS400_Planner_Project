@@ -1,31 +1,28 @@
-Taskly
-A personal planner app built to help you stay on top of your tasks, appointments, and events. Think of it as a smart agenda on your phone — simple, clean, and easy to use.
+Taskly 📋
+Taskly is a personal planner app that helps you stay on top of your tasks, appointments, and events. Think of it as a smart agenda on your phone — create tasks with due dates and times, set them to repeat, and view everything on a calendar. Simple and easy to use for students, professionals, and anyone who wants to stay organized.
 
-What it does
+Software & Technologies Used
 
-Create tasks with a title, description, category, priority, due date, and optional time
-Organize tasks by category — Homework, Appointments, Meetings, Payments, and more
-Mark tasks as complete and track your progress from the home dashboard
-Set tasks to repeat monthly or yearly on the same day
-View all your tasks on a calendar that goes 10 years out
-Filter tasks by Today, Upcoming, Completed, or by category
-Dark and light mode support
+Flutter (Dart) — Mobile and web frontend
+Python + FastAPI — Backend REST API
+SQLAlchemy — ORM for database management
+PostgreSQL — Database (hosted on Render)
+bcrypt + python-jose — Password hashing and JWT authentication
+Render — Cloud hosting for backend and database
 
 
-Tech Stack
+How to Run
 Backend
-
-Python + FastAPI
-SQLAlchemy ORM
-PostgreSQL (hosted on Render)
-JWT authentication (bcrypt + python-jose)
-
+bashcd backend
+.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload
 Frontend
+bashcd frontend
+flutter run -d chrome     # Web
+flutter run               # Android emulator
 
-Flutter (Dart)
-Works on Android, iOS, and Web
+Before running locally, set baseUrl in api_service.dart:
 
-Deployed
-
-Backend: https://taskly-backend-qrjc.onrender.com
-Repo: github.com/J4lR/CS400_Planner_Project
+Local Chrome: http://127.0.0.1:8000
+Android emulator: http://10.0.2.2:8000
+Deployed: https://taskly-backend-qrjc.onrender.com
