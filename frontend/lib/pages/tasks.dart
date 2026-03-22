@@ -176,16 +176,18 @@ class _TasksPageState extends State<TasksPage> {
   crossAxisAlignment: WrapCrossAlignment.center,
   children: [
     Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.calendar_today, size: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
-        const SizedBox(width: 4),
-        Text(
-          task['due_date'] ?? '',
-          style: TextStyle(fontSize: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
-        ),
-      ],
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    Icon(Icons.calendar_today, size: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
+    const SizedBox(width: 4),
+    Text(
+      task['due_time'] != null
+          ? '${task['due_date']} at ${task['due_time']}'
+          : task['due_date'] ?? '',
+      style: TextStyle(fontSize: 12, color: isOverdue ? const Color(0xFFEF4444) : const Color(0xFF8B949E)),
     ),
+  ],
+),
     Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),

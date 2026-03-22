@@ -319,7 +319,12 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(task['due_date'] ?? '', style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280))),
+                    Text(
+                      task['due_time'] != null
+                          ? '${task['due_date']} at ${task['due_time']}'
+                          : task['due_date'] ?? '',
+                      style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF8B949E) : const Color(0xFF6B7280)),
+                    ),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
