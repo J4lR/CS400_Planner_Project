@@ -5,9 +5,21 @@ from sqlalchemy.orm import Session
 from app.db import init_db, get_db
 from typing import Optional
 from app.models import Task, User
-from app.auth import hash_password, verify_password
+from app.auth import hash_password, verify_password, create_token, decode_token
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1)
@@ -16,6 +28,9 @@ class TaskCreate(BaseModel):
     category: str = "task"
     description: Optional[str] = None
     repeats: bool = False
+    priority: str = "medium"
+    due_time: Optional[str] = None
+    repeat_type: Optional[str] = None
 
     @field_validator("title")
     @classmethod
@@ -33,6 +48,14 @@ class TaskCreate(BaseModel):
             raise ValueError(f"Category must be one of: {allowed}")
         return v
 
+    @field_validator("priority")
+    @classmethod
+    def priority_must_be_valid(cls, v: str) -> str:
+        allowed = ["low", "medium", "high"]
+        if v not in allowed:
+            raise ValueError(f"Priority must be one of: {allowed}")
+        return v
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -41,6 +64,9 @@ class TaskUpdate(BaseModel):
     category: Optional[str] = None
     description: Optional[str] = None
     repeats: Optional[bool] = None
+    priority: Optional[str] = None
+    due_time: Optional[str] = None
+    repeat_type: Optional[str] = None
 
     @field_validator("title")
     @classmethod
@@ -67,9 +93,22 @@ class UserCreate(BaseModel):
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
 
-class UserLogin(BaseModel):
-    username: str
-    password: str
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = decode_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user_id = payload.get("user_id")
+    if user_id is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
 
 @app.on_event("startup")
 def on_startup():
@@ -85,37 +124,93 @@ def root():
 def get_tasks(
     category: Optional[str] = None,
     filter: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    query = db.query(Task)
+    query = db.query(Task).filter(Task.user_id == current_user.id)
 
-    # Filter by category
     if category:
         query = query.filter(Task.category == category)
 
-    # Filter by date
-    if filter == "today":
-        today = date.today().isoformat()
-        query = query.filter(Task.due_date == today)
-    elif filter == "upcoming":
-        today = date.today().isoformat()
-        query = query.filter(Task.due_date > today)
-    elif filter == "completed":
-        query = query.filter(Task.completed == True)
-
     tasks = query.order_by(Task.due_date.asc()).all()
-    return tasks
+
+    # Build result with repeated task occurrences
+    result = []
+    today = date.today()
+
+    for task in tasks:
+        task_dict = {
+            "id": task.id,
+            "title": task.title,
+            "due_date": task.due_date,
+            "completed": task.completed,
+            "category": task.category,
+            "description": task.description,
+            "repeats": task.repeats,
+            "repeat_type": task.repeat_type,
+            "due_time": task.due_time,
+            "priority": task.priority,
+            "user_id": task.user_id,
+        }
+
+        result.append(task_dict)
+        print(f"Task: {task.title}, repeat_type: {task.repeat_type}, repeats: {task.repeats}")
+
+        # Generate future occurrences for repeating tasks
+        if task.repeat_type in ("monthly", "yearly") and not task.completed:
+            original_date = date.fromisoformat(task.due_date)
+            current_date = original_date
+
+            for _ in range(24):  # generate up to 24 future occurrences
+                if task.repeat_type == "monthly":
+                    month = current_date.month + 1
+                    year = current_date.year + (month - 1) // 12
+                    month = ((month - 1) % 12) + 1
+                    try:
+                        current_date = current_date.replace(year=year, month=month)
+                    except ValueError:
+                        break
+                elif task.repeat_type == "yearly":
+                    try:
+                        current_date = current_date.replace(year=current_date.year + 1)
+                    except ValueError:
+                        break
+
+                if current_date > today + __import__('datetime').timedelta(days=365 * 10):
+                    break
+
+                occurrence = task_dict.copy()
+                occurrence["due_date"] = current_date.isoformat()
+                occurrence["id"] = task.id  # same id so updates apply to original
+                result.append(occurrence)
+
+    # Apply filter after generating occurrences
+    if filter == "today":
+        today_str = today.isoformat()
+        result = [t for t in result if t["due_date"] == today_str]
+    elif filter == "upcoming":
+        today_str = today.isoformat()
+        result = [t for t in result if t["due_date"] > today_str]
+    elif filter == "completed":
+        result = [t for t in result if t["completed"]]
+
+    result.sort(key=lambda t: t["due_date"])
+    return result
 
 
 @app.post("/tasks")
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     new_task = Task(
         title=task.title,
         due_date=task.due_date.isoformat(),
         completed=task.completed,
         category=task.category,
         description=task.description,
-        repeats=task.repeats
+        repeats=task.repeats,
+        priority=task.priority,
+        due_time=task.due_time,
+        repeat_type=task.repeat_type,
+        user_id=current_user.id
     )
     db.add(new_task)
     db.commit()
@@ -124,8 +219,8 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
 
 @app.patch("/tasks/{task_id}")
-def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
-    existing = db.query(Task).filter(Task.id == task_id).first()
+def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    existing = db.query(Task).filter(Task.id == task_id, Task.user_id == current_user.id).first()
 
     if not existing:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -142,6 +237,12 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
         existing.description = task.description
     if task.repeats is not None:
         existing.repeats = task.repeats
+    if task.priority is not None:
+        existing.priority = task.priority
+    if task.due_time is not None:
+        existing.due_time = task.due_time
+    if task.repeat_type is not None:
+        existing.repeat_type = task.repeat_type
 
     db.commit()
     db.refresh(existing)
@@ -149,8 +250,8 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)):
 
 
 @app.delete("/tasks/{task_id}")
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    existing = db.query(Task).filter(Task.id == task_id).first()
+def delete_task(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    existing = db.query(Task).filter(Task.id == task_id, Task.user_id == current_user.id).first()
 
     if not existing:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -158,6 +259,7 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(existing)
     db.commit()
     return {"message": f"Task {task_id} deleted"}
+
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -177,13 +279,14 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.username == user.username).first()
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.username == form_data.username).first()
     
     if not existing:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
-    if not verify_password(user.password, existing.password):
+    if not verify_password(form_data.password, existing.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
-    return {"message": f"Welcome back {existing.username}!"}
+    token = create_token({"user_id": existing.id})
+    return {"access_token": token, "token_type": "bearer", "username": existing.username}

@@ -14,6 +14,10 @@ class Task(Base):
     category = Column(String, default="task")
     description = Column(String, nullable=True)
     repeats = Column(Boolean, default=False)
+    user_id = Column(Integer, nullable=True)
+    priority = Column(String, default="medium")
+    due_time = Column(String, nullable=True)
+    repeat_type = Column(String, nullable=True)
 
 
 class User(Base):
